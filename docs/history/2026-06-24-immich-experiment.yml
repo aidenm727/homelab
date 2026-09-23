@@ -4,7 +4,7 @@ change_type: service
 status: verified
 
 intent:
-  - Use the new virtualization storage/workload boundary for a real containerized application experiment
+  - Use the new virtualization storage/workload boundary for a containerized application experiment
 
 summary:
   - Created an isolated Debian-class system container on the workload pool

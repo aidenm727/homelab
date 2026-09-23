@@ -4,7 +4,7 @@ change_type: verification
 status: verified
 
 intent:
-  - Establish a bounded snapshot of the Homelab after it became its own project
+  - Establish a dated Homelab snapshot
   - Check the highest-value operational, security, recovery, and gaming assumptions without publishing private topology
 
 scope:
@@ -23,12 +23,12 @@ summary:
   - Verified Prometheus was scraping both the core-services and virtualization environments
   - Found password SSH still enabled because an earlier cloud-init drop-in won configuration precedence
   - Moved the owner SSH policy earlier in configuration order and verified effective key-only remote authentication
-  - Tested selected SSH, DNS, HTTP, and HTTPS ports from a genuinely separate external IPv4 network and observed no successful connection
+  - Tested selected SSH, DNS, HTTP, and HTTPS ports from an external cellular IPv4 network and observed no successful connection
   - Verified successful local and encrypted off-site Restic backup jobs
   - Verified the scheduled local hypervisor backup for the gaming VM had produced an archive
   - Confirmed Crafty Controller was running and traced the gaming VM's high memory use to an active modded Minecraft Java process
   - Stopped the on-demand game workload and confirmed the VM returned to a low idle memory footprint
-  - Left public IPv6 exposure explicitly unresolved because the external client path lacked working IPv6 routing
+  - Recorded public IPv6 exposure as unresolved because the external client lacked working IPv6 routing
 
 verification:
   - Core-services system manager reported no failed units during the observation
@@ -48,4 +48,4 @@ known_limits:
   - Public IPv6 exposure was not verified
   - Hypervisor-local VM backup remains in the virtualization host failure domain
   - Power-loss resilience was not demonstrated by a verified UPS
-  - Exact hosts, addresses, private DNS, routes, backup destinations, credentials, and operational commands are intentionally omitted
+  - Exact hosts, addresses, private DNS, routes, backup destinations, credentials, and operational commands are omitted

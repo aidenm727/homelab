@@ -1,9 +1,8 @@
 # Architecture
 
-The Homelab is intentionally split into a small always-on core and a more
-flexible virtualization environment. The point is not maximum complexity; it is
-to keep important lightweight services stable while still having room to break,
-rebuild, and experiment elsewhere.
+The Homelab has two main compute roles: a small always-on core-services machine
+and a Proxmox virtualization host. This keeps DNS, ingress, monitoring, password
+management, and backups independent from heavier VMs and game workloads.
 
 ## Topology
 
@@ -32,79 +31,71 @@ Owner devices
 Gaming VM
     └── Crafty Controller
             └── Minecraft workloads
-                    └── explicit player ingress via Playit
+                    └── player ingress via Playit
 ```
 
-No public management path is required by this design. Player-facing game ingress
-is deliberately separate from administrative access.
+Administration uses Tailscale. Player-facing game traffic uses a separate Playit
+path.
 
-## Why two compute roles?
+## Compute roles
 
-The core-services machine runs things I want to be predictable and inexpensive
-to leave on: DNS, ingress, monitoring, password management, and backups.
+The T430 runs lower-resource services that benefit from staying available:
+DNS, ingress, monitoring, Vaultwarden, Homepage, and backup jobs.
 
-The Proxmox machine is the opposite side of the lab. It is where workloads can
-have stronger isolation, use more resources, or be rebuilt without coupling
-those changes to the core network/services machine.
+The Proxmox host runs VMs/LXCs, gaming infrastructure, and application
+experiments. Workloads can be rebuilt or resized there without tying those
+changes to the core-services machine.
 
-This separation is simple, but it has paid off repeatedly—especially for gaming
-and application experiments.
+## Networking and access
 
-## Private networking and access
+Tailscale provides remote administrative access to the lab. SSH, Proxmox,
+dashboards, and other management surfaces remain off the public Internet.
 
-Tailscale is the administrative network. Remote management does not depend on
-opening SSH, Proxmox, dashboards, or other admin surfaces directly to the public
-Internet.
-
-Pi-hole provides local DNS/filtering. Traefik is the ingress boundary for
-private web services and internal HTTPS. DNS, ingress, and application
-authentication are intentionally separate controls.
+Pi-hole handles local DNS and filtering. Traefik routes private web services and
+terminates internal HTTPS. Applications keep their own authentication where
+required.
 
 ## Virtualization and storage
 
-Proxmox provides the isolation boundary for VM/LXC workloads. The virtualization
-host separates system storage from a dedicated NVMe workload pool, with
-additional archive/preservation storage kept as another role.
+Proxmox provides VM/LXC isolation. The host uses separate system and workload
+storage roles, including an NVMe pool for VM/LXC workloads and additional
+archive/preservation storage.
 
-The important distinction is failure domain:
+Failure domains are tracked explicitly:
 
-- VM storage is capacity, not backup.
-- A hypervisor snapshot is useful rollback, not independent protection.
-- A VM backup stored on the same physical host helps with guest failure but does
-  not protect against complete host loss.
-- Data worth preserving should have an independent copy before storage is
-  repurposed.
+- VM storage provides capacity for guests.
+- Hypervisor snapshots provide rollback.
+- VM backups stored on the Proxmox host cover guest-level recovery but remain in
+  the same physical-host failure domain.
+- Preservation data is copied and checked before source storage is repurposed.
 
 ## Observability
 
-Monitoring is deliberately layered rather than collapsed into one dashboard:
+The monitoring stack is split by function:
 
 ```text
-Uptime Kuma  -> Is the expected surface responding?
-Prometheus   -> What is the host/service measuring?
-Grafana      -> What do those measurements look like over time?
-Loki / Alloy -> What happened around an event?
+Uptime Kuma  -> service reachability
+Prometheus   -> metrics collection
+Grafana      -> metrics visualization
+Loki / Alloy -> centralized logs
 ```
 
-These tools are useful observations, not the source of truth for system state or
-backup recoverability.
+These signals are used together during troubleshooting. Backup recovery is
+checked through restore testing.
 
 ## Backup and recovery
 
-The core-services backup path uses Restic for versioned encrypted backups with
-both local and Backblaze B2 copies. Restore testing is treated separately from
-job success.
+The core-services host uses Restic for versioned encrypted backups with local
+and Backblaze B2 copies. Restore tests have been performed against both paths.
 
-The gaming VM also has a scheduled Proxmox backup, but that copy is currently in
-the same physical-host failure domain. That is a known limitation rather than a
-reason to pretend the backup is more resilient than it is.
+The gaming VM also has scheduled Proxmox backups. Those archives currently stay
+on the virtualization host, so total host loss remains an uncovered failure
+case for that backup path.
 
-## Public/private boundary
+## Public repository boundary
 
-The public repo can safely show hardware classes/specs, technologies, service
-roles, architecture, failure-domain reasoning, and selected dated engineering
-stories.
-
-It intentionally does not publish private addresses, internal DNS names,
-credentials, exact management endpoints, serial numbers, secret locations,
-sensitive backup identifiers, or executable recovery procedures.
+The public repo includes hardware specs, technologies, service roles,
+architecture, failure-domain notes, and selected dated changes. It excludes
+private addresses, internal DNS names, credentials, exact management endpoints,
+serial numbers, secret locations, sensitive backup identifiers, and executable
+recovery procedures.

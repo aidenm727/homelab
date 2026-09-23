@@ -1,10 +1,8 @@
 # Gaming Infrastructure
 
-Gaming is one of the more fun parts of the Homelab, but it has also generated
-some of the best real infrastructure problems in the project.
-
-The basic goal is simple: keep personal/friends' worlds durable and easy to run
-without turning the core-services machine into a game server.
+Gaming is a primary workload on the Proxmox host. Minecraft servers run inside a
+dedicated Debian VM so game-server changes and Java memory use stay isolated
+from core network and owner services.
 
 ## Architecture
 
@@ -22,23 +20,20 @@ Proxmox host
             │    └── private administration
             │
             └── Playit
-                 └── explicit player-facing game ingress
+                 └── player-facing game ingress
 ```
 
-Administrative access and player access are separate paths. Crafty and the VM
-remain private; Playit exists specifically for the game traffic that needs to be
-reachable by players.
+Crafty and VM administration use Tailscale. Playit handles the game traffic that
+needs to be reachable by players.
 
 ## Crafty Controller
 
-Crafty provides the Minecraft-specific control plane: server creation,
-configuration, console access, start/stop/restart, files, versions, and the basic
-operational view of each world.
+Crafty handles Minecraft server creation, configuration, console access,
+start/stop/restart, files, versions, and server status.
 
-The point is not to rebuild Crafty. Longer term, a personal Gaming Hub can sit
-above it and focus on the experience I actually care about—worlds, players,
-backups/history, versions, and quick status—while Crafty continues to own the
-server-management mechanics.
+A future Gaming Hub could add a higher-level view of worlds, players, backup
+history, versions, and status while leaving server-management mechanics in
+Crafty.
 
 ## StoneBlock 4
 
@@ -49,40 +44,34 @@ One documented workload is FTB StoneBlock 4:
 - Java 21
 - 2 GiB initial / 8 GiB maximum Java heap
 
-During the September 2026 baseline, the server had accidentally remained active
-for roughly a week and the gaming VM appeared memory constrained. Process-level
-inspection showed the Java server itself accounting for the large footprint.
-After the server was stopped, the VM returned to a low idle memory state.
+During the September 2026 baseline, the server had remained active for roughly a
+week and the VM showed high memory use. Process-level inspection traced the
+usage to the Java server. VM memory returned to a low idle state after the server
+was stopped.
 
-That changed the operating model: modded servers are **on-demand workloads**.
-Crafty can stay available without paying the memory cost of a large Java process
-when nobody is playing.
+Modded servers now run on demand. Crafty can remain available while the Java
+process stays off when nobody is playing.
 
-## Worlds are data, not disposable compute
+## World data and backups
 
-The VM and server processes can be rebuilt. Personal worlds are different.
+The gaming VM has scheduled Proxmox backups. Longer term, world data should also
+have explicit world-level history and restore points independent of a specific
+VM installation.
 
-The current design includes scheduled VM backup, but the longer-term goal is to
-make game-world continuity more explicit:
+Possible additions include:
 
-- world-level backup/history;
-- easy restore points;
-- clear Minecraft/modpack version history;
-- durable personal worlds that outlive a particular VM or server install; and
-- eventually a **Game World Vault** view of worlds, milestones, screenshots, and
-  history.
+- world-level backup history;
+- restore points;
+- Minecraft and modpack version history;
+- long-lived personal worlds; and
+- a Game World Vault view for worlds, milestones, screenshots, and history.
 
-## Where this could go
+## Future work
 
-The broader Gaming Hub direction includes:
-
-- a durable Vanilla Forever world;
+- durable Vanilla Forever world;
 - friends' SMP infrastructure;
-- better world/backups/history UX;
+- better world/backup/history views;
 - simple server status and start/stop controls;
-- a future gaming PC that can run Sunshine for Moonlight streaming;
-- wake/sleep state surfaced through the Homelab Home; and
-- local-AI/GPU workloads sharing the future high-performance node when sensible.
-
-Persistent Minecraft belongs on the virtualization host. A future high-end PC
-should be allowed to sleep when nobody needs interactive/GPU work.
+- Sunshine/Moonlight support on a future gaming PC;
+- wake/sleep state in the Homelab Home; and
+- shared use of a future GPU node for gaming and local AI.

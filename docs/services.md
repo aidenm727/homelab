@@ -1,27 +1,26 @@
 # Services
 
-This is a service-oriented view of the lab: what each piece is for and how the
-pieces relate. It is not a live status page.
+Service inventory from the September 2026 lab snapshot.
 
-## September 2026 service snapshot
+## Service map
 
 | Area | Service | Role |
 | --- | --- | --- |
-| Private access | **Tailscale** | Remote administration without exposing management surfaces publicly |
+| Private access | **Tailscale** | Remote administration of private management surfaces |
 | DNS / filtering | **Pi-hole** | Local name resolution and DNS filtering |
 | Ingress | **Traefik** | Private HTTPS routing for web services |
-| Passwords | **Vaultwarden** | Self-hosted password-management service |
-| Start page | **Homepage** | Current owner-facing entry point into the lab |
+| Passwords | **Vaultwarden** | Self-hosted password management |
+| Start page | **Homepage** | Owner-facing entry point into the lab |
 | Metrics | **Prometheus + node exporter** | Host/service metrics collection |
 | Dashboards | **Grafana** | Metrics visualization and trends |
 | Logs | **Loki + Alloy** | Centralized log collection/querying |
-| Availability | **Uptime Kuma** | Simple service reachability monitoring |
+| Availability | **Uptime Kuma** | Service reachability monitoring |
 | Backup | **Restic** | Versioned encrypted local/off-site backups |
 | Gaming | **Crafty Controller** | Minecraft server management inside the gaming VM |
-| Game ingress | **Playit** | Explicit player-facing game connectivity without exposing admin services |
-| Game workload | **Minecraft** | Vanilla/modded worlds and game-server experiments |
+| Game ingress | **Playit** | Player-facing game connectivity |
+| Game workload | **Minecraft** | Vanilla/modded worlds and server experiments |
 
-## How the core services fit together
+## Core service relationships
 
 ```text
 Pi-hole
@@ -48,24 +47,18 @@ Restic
   └── encrypted off-site backup
 ```
 
-The separation matters. A Grafana dashboard looking healthy does not prove a
-service is reachable. A Kuma check being green does not prove a backup can be
-restored. Traefik routing successfully does not replace application-level
-authentication.
+Each layer has a specific job. Kuma checks reachability, Prometheus collects
+metrics, Grafana visualizes them, Loki stores logs, and Restic provides backup
+history. Restore testing is the recovery check.
 
-## Core-services container stack
+## Core-services stack
 
-The September 2026 core-services snapshot included the main services above plus
-supporting health/monitoring containers. The machine had enough CPU, memory, and
-storage headroom that the stack did not need to be moved simply for capacity.
+The September 2026 T430 snapshot included the services above plus supporting
+health and monitoring containers. CPU, memory, and storage all had headroom for
+the current stack.
 
 ## Experiments
 
-Not every service that gets tried becomes permanent infrastructure. Immich, for
-example, has been used as an isolated virtualization/application experiment but
-is not treated as a critical current service. Photo hosting only becomes worth
-revisiting once storage and backup requirements are strong enough to support it
-properly.
-
-That is the general rule for the lab: experiments are cheap; permanent services
-have to earn their operational cost.
+Immich has been used as an isolated virtualization/application experiment and is
+currently low priority. Photo hosting can be revisited once storage and backup
+requirements are defined.
