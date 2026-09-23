@@ -63,6 +63,24 @@ resources or stronger isolation.
 
 [Full service map](docs/services.md)
 
+## Screenshots
+
+### Services and monitoring
+
+<p align="center">
+  <img src="assets/screenshots/homepage.png" alt="Homelab Homepage service dashboard" width="49%">
+  <img src="assets/screenshots/grafana.png" alt="Grafana host metrics dashboard" width="49%">
+</p>
+
+### Virtualization and gaming
+
+<p align="center">
+  <img src="assets/screenshots/proxmox.png" alt="Sanitized Proxmox gaming VM summary" width="36%">
+  <img src="assets/screenshots/crafty.png" alt="Crafty Controller Minecraft server dashboard" width="61%">
+</p>
+
+*The Proxmox screenshot is sanitized to remove private host and address details.*
+
 ## Selected engineering work
 
 ### SSH hardening and configuration precedence
