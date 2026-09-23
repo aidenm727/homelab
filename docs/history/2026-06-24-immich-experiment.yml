@@ -1,0 +1,19 @@
+date: 2026-06-24
+title: Deploy Immich as an isolated virtualization experiment
+change_type: service
+status: verified
+
+intent:
+  - Use the new virtualization storage/workload boundary for a real containerized application experiment
+
+summary:
+  - Created an isolated Debian-class system container on the workload pool
+  - Installed Docker Engine and Docker Compose inside the guest
+  - Deployed the Immich application stack with a generated database credential
+  - Kept guest identity, resource details, paths, endpoints, and addresses out of the public record
+
+verification:
+  - Verified the application returned the expected local health response
+  - Verified application components reported healthy state
+  - Verified the container runtime and Compose tooling were available
+  - Verified the guest was running at the time of the dated change

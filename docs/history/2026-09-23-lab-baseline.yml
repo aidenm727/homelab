@@ -1,0 +1,51 @@
+date: 2026-09-23
+title: Homelab baseline and security/recovery verification
+change_type: verification
+status: verified
+
+intent:
+  - Establish a bounded snapshot of the Homelab after it became its own project
+  - Check the highest-value operational, security, recovery, and gaming assumptions without publishing private topology
+
+scope:
+  - core services
+  - virtualization
+  - private DNS and ingress
+  - observability
+  - remote administration security
+  - backup and recovery
+  - gaming workload
+
+summary:
+  - Verified the core-services machine was stable and the expected containerized services were running
+  - Corrected a private split-DNS routing omission and verified private service resolution
+  - Verified the reverse proxy, DNS, monitoring, dashboard, and password-management surfaces were responding as expected
+  - Verified Prometheus was scraping both the core-services and virtualization environments
+  - Found password SSH still enabled because an earlier cloud-init drop-in won configuration precedence
+  - Moved the owner SSH policy earlier in configuration order and verified effective key-only remote authentication
+  - Tested selected SSH, DNS, HTTP, and HTTPS ports from a genuinely separate external IPv4 network and observed no successful connection
+  - Verified successful local and encrypted off-site Restic backup jobs
+  - Verified the scheduled local hypervisor backup for the gaming VM had produced an archive
+  - Confirmed Crafty Controller was running and traced the gaming VM's high memory use to an active modded Minecraft Java process
+  - Stopped the on-demand game workload and confirmed the VM returned to a low idle memory footprint
+  - Left public IPv6 exposure explicitly unresolved because the external client path lacked working IPv6 routing
+
+verification:
+  - Core-services system manager reported no failed units during the observation
+  - Expected service containers were running
+  - Private DNS resolution succeeded after the scoped routing correction
+  - Reverse-proxy services and visible monitoring targets reported healthy state
+  - SSH daemon syntax validation passed before reload
+  - A fresh public-key-only SSH session succeeded after hardening
+  - A fresh password-only SSH attempt failed after hardening
+  - External IPv4 checks were performed from a separate cellular network with private overlay access disabled
+  - Local and off-site Restic backup services reported successful completion
+  - Scheduled VM backup configuration and a produced archive were both observed
+  - Gaming workload memory attribution was confirmed before and after shutdown
+
+known_limits:
+  - This record does not establish runtime state after 2026-09-23
+  - Public IPv6 exposure was not verified
+  - Hypervisor-local VM backup remains in the virtualization host failure domain
+  - Power-loss resilience was not demonstrated by a verified UPS
+  - Exact hosts, addresses, private DNS, routes, backup destinations, credentials, and operational commands are intentionally omitted

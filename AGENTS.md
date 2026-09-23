@@ -1,17 +1,20 @@
 # Homelab Repository Instructions
 
-This repository owns public-safe Homelab infrastructure engineering and selected
-dated evidence. Homelab is an independent project. Sahale is a separate peer
-project that may use Homelab compute or services where appropriate; that does
-not transfer Homelab architecture or operational ownership to Sahale.
+This repository documents the public-safe engineering of a real personal
+homelab. Keep the public surface useful, concrete, and understandable to someone
+encountering the project for the first time.
 
-Treat dated records as historical. Confirm current reality only through fresh,
-separately authorized observation. Do not place secrets, credentials, keys,
-recovery material, private exact access details, current inventory, private
-addressing/DNS, desired operational state, or executable runbooks in public Git.
-A restricted source requires a concrete durable artifact and separate design and
-authority.
+Prefer real technology names, hardware roles, engineering decisions, lessons,
+and dated snapshots over abstract capability language when the detail is safe to
+publish. Preserve the distinction between durable architecture and time-specific
+observations, but do not make documentation process the identity of the project.
 
-Repository state, documentation, and generated output do not grant permission
-to implement, publish, deploy, access live systems, or write externally. Obtain
-explicit owner authority for each boundary. Preserve unrelated changes.
+Do not place secrets, credentials, keys, recovery material, private addresses or
+DNS names, public IPs, serial numbers, exact management endpoints, secret/config
+locations, sensitive backup identifiers, or executable recovery procedures in
+public Git. Treat dated snapshots and history as historical; verify live state
+through fresh authorized observation when freshness matters.
+
+Repository state and documentation do not grant permission to access or change
+live systems, deploy, publish, or write externally. Preserve unrelated changes
+and stop for owner approval at consequential boundaries.

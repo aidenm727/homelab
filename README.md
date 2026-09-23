@@ -1,123 +1,157 @@
-# Homelab
+# Aiden's Homelab
 
-A public engineering record for a small, independently operated homelab focused
-on practical infrastructure: virtualization, Linux systems, private networking,
-containerized services, observability, backup/recovery, gaming infrastructure,
-and bounded experimentation.
+My personal homelab for learning infrastructure by actually running it. I built
+most of it from repurposed hardware and use it for private networking,
+self-hosted services, monitoring, backups, game servers, and experiments.
 
-The project is intentionally more than a service list. It documents the
-architecture, trust boundaries, failure domains, and verification practices that
-make the lab understandable and maintainable over time.
+I'm a CS student, so learning is a big part of the point, but I try to make the
+lab useful first. Most of the things here exist because I wanted a service, hit
+a limitation, broke something, or found a systems problem worth understanding.
 
-## What this project demonstrates
+> **Lab snapshot — September 2026.** Hardware and service details below describe
+> a dated snapshot of the lab, not a promise that every component is always
+> online or unchanged.
 
-- **Virtualization and workload isolation** with Proxmox VE, VM/LXC boundaries,
-  and explicit storage/failure-domain reasoning.
-- **Linux infrastructure** operated as separate lower-change core-services and
-  flexible compute environments.
-- **Private administration** over an owner-controlled overlay network rather
-  than public management exposure.
-- **Internal DNS and HTTPS ingress** using DNS filtering/name resolution and a
-  dedicated reverse-proxy boundary.
-- **Containerized self-hosting** for owner services, monitoring, and experiments.
-- **Observability separation** across availability checks, metrics, dashboards,
-  and logs.
-- **Backup and recovery engineering** that distinguishes local snapshots,
-  independent encrypted copies, off-site protection, and restore verification.
-- **Gaming infrastructure** with an isolated management/runtime boundary and
-  intentionally on-demand game workloads.
-- **Security and operations discipline** based on effective-configuration
-  inspection, least-exposure defaults, positive/negative verification, and
-  dated evidence rather than assumptions.
+## Lab at a glance
 
-## Architecture at a glance
+| System | Hardware / platform | What it does |
+| --- | --- | --- |
+| **Core services** | Lenovo ThinkPad T430 · Ubuntu Server · ~8 GiB RAM | DNS, private ingress, monitoring, Vaultwarden, start page, backups |
+| **Virtualization host** | Ryzen 5 2600 · 16 GiB DDR4 · Proxmox VE · SATA SSD + NVMe | VMs/LXCs, gaming infrastructure, application experiments |
+| **Gaming VM** | Debian 12 · Docker · 4 vCPU · 10 GiB RAM | Crafty Controller, Minecraft workloads, game ingress |
+| **Admin / development** | ASUS ROG Zephyrus G14 (2024) · Windows 11 + WSL | SSH administration, development, maintenance, local experiments |
+
+More detail: [hardware and roles](docs/hardware.md).
+
+## Architecture
 
 ```text
-Owner devices
-    │
-    └── private overlay access
-             │
-             ├── Core-services environment
-             │     ├── DNS / network policy
-             │     ├── internal HTTPS ingress
-             │     ├── availability / metrics / logs
-             │     ├── selected owner services
-             │     └── backup coordination
-             │
-             └── Virtualization environment
-                   ├── isolated application workloads
-                   ├── gaming workload boundary
-                   └── disposable / experimental compute
+                         AIDEN'S HOMELAB
 
-Protected data
-    ├── local versioned backup
-    └── encrypted independent / off-site copy
-             └── dated restore verification
+                    Tailscale private access
+                             │
+                ┌────────────┴─────────────┐
+                │                          │
+          ThinkPad T430               Proxmox host
+          Ubuntu Server               Ryzen 5 2600
+                │                          │
+          Docker services                VMs / LXCs
+                │                          │
+     ┌──────────┼──────────┐          Gaming VM
+     │          │          │               │
+  Pi-hole    Traefik   Observability     Crafty
+                         │                 │
+                 Prometheus / Grafana   Minecraft
+                    Loki / Kuma            │
+                                          Playit
+
+                Backup / recovery
+                     │
+               Restic + B2
 ```
 
-This diagram describes architectural roles, not a live inventory or reachable
-topology.
+The lab deliberately separates the lower-change services I want available most
+of the time from heavier or more experimental workloads that benefit from VM/LXC
+isolation.
 
-## Technology
+[Architecture details →](docs/architecture.md)
 
-Representative technologies documented by dated evidence include:
+## What runs here
 
-- Proxmox VE
-- Linux
-- Docker / Docker Compose
-- Tailscale
-- Pi-hole
-- Traefik
-- Prometheus
-- Grafana
-- Loki / Alloy
-- Uptime Kuma
-- Restic
-- Crafty Controller
-- Minecraft
+**Networking & access** — Tailscale for private administration, Pi-hole for
+local DNS/filtering, and Traefik for private HTTPS ingress.
 
-Technology names explain engineering choices; they do not imply that every
-component is currently online or unchanged.
+**Observability** — Prometheus and node exporter for metrics, Grafana for
+visualization, Loki + Alloy for logs, and Uptime Kuma for simple availability
+checks.
 
-## Engineering records
+**Core services** — Vaultwarden, Homepage, and the supporting Docker services
+that make the lab useful day to day.
 
-- [Infrastructure roles and trust boundaries](docs/architecture/infrastructure.md)
-- [Virtualization, storage, and workload isolation](docs/architecture/infrastructure-virtualization.md)
-- [Service capability architecture](docs/architecture/services.md)
-- [Selected dated engineering evidence](docs/evidence/)
-- [Repository instructions and public-safety boundary](AGENTS.md)
+**Backup & recovery** — Restic for local and encrypted Backblaze B2 backups,
+plus scheduled Proxmox VM backups. I treat restore testing as a separate problem
+from simply seeing a green backup job.
 
-The architecture records began as a public-safe extraction of earlier Sahale
-infrastructure work and are now owned here. Sahale is a separate peer project
-that may use Homelab compute or services when appropriate; it does not define
-Homelab architecture or ownership.
+**Gaming** — Crafty Controller inside a dedicated gaming VM, Minecraft servers,
+and Playit for explicit player ingress while administration stays private.
 
-## Evidence and freshness
+[Full service map →](docs/services.md)
 
-This repository deliberately separates **architecture** from **runtime state**.
+## A few engineering stories
 
-Architecture documents describe durable roles, boundaries, and engineering
-reasoning. Evidence records describe what was verified on a specific date.
-Neither is a promise that a live system still has the same version, inventory,
-health, address, route, or recovery readiness.
+### Private infrastructure without public admin surfaces
 
-Current runtime reality belongs to fresh authorized observation of the live
-systems. The public repository therefore omits exact private addressing, DNS
-identities, credentials, secret locations, live inventory, current health
-snapshots, and executable recovery procedures.
+Remote administration lives behind Tailscale rather than exposed management
+ports. Internal names are resolved through Pi-hole, while Traefik gives private
+services a consistent HTTPS entry point.
 
-A dated September 23, 2026 public-safe baseline is indexed with the
-[selected engineering evidence](docs/evidence/).
+### Backup means restore
 
-## Direction
+The core-services environment uses versioned Restic backups locally and off-site
+in B2. I have restored the Vaultwarden database from both paths and checked the
+restored SQLite database rather than treating successful backup jobs as proof of
+recoverability.
 
-Near-term work is intentionally demand-driven rather than a race to add
-services. Candidate directions include a better owner-facing Homelab home,
-repeatable configuration management, selected personally useful self-hosted
-services, local-AI experimentation on existing hardware, a more cohesive gaming
-experience, and future storage/media work when real capacity requirements
-justify it.
+### Debugging SSH configuration, not just editing it
 
-The goal is a useful personal computing environment that remains understandable
-to operate and credible to inspect—not a collection of containers for its own
-sake.
+While hardening the core-services host, `PasswordAuthentication no` was present
+in a new drop-in but password authentication was still effective. The cause was
+an earlier cloud-init fragment and OpenSSH's first-obtained-value behavior. I
+fixed the ordering, validated the daemon configuration, then tested both a
+successful key-only login and an expected-failure password login.
+
+### Letting the workload explain the resource problem
+
+A modded StoneBlock server made the gaming VM look memory-constrained. Instead
+of assuming a leak or immediately adding hardware, I traced the usage to the
+active Java process. Stopping the on-demand server returned the VM to a low idle
+memory footprint, which reinforced the decision to keep expensive game workloads
+on-demand.
+
+### Building around old hardware
+
+The lab started with machines I already had. That constraint has been useful: it
+forced me to think about workload placement, memory pressure, storage roles,
+power usage, backup failure domains, and when an upgrade is actually justified.
+
+[How I operate the lab →](docs/operations.md)
+
+## Gaming
+
+Minecraft has been one of the most useful "real" workloads in the lab. It has
+pushed me into VM isolation, game-specific ingress, backup/history thinking,
+version management, memory debugging, and deciding what should actually run
+24/7.
+
+[Gaming infrastructure and roadmap →](docs/gaming.md)
+
+## What I'm exploring next
+
+- a better personalized **Homelab Home** instead of a generic start page;
+- **Ansible** for repeatable host configuration and validation;
+- local AI/model serving on hardware I already own before buying dedicated AI
+  equipment;
+- a future gaming/GPU machine that can also provide Sunshine/Moonlight streaming
+  and local inference;
+- personal media and storage only when a real collection justifies the capacity;
+- a disposable Kubernetes/GitOps lab for learning without moving critical
+  services into Kubernetes just for the sake of it; and
+- weird/fun projects such as the **Aiden TV** CRT channel network.
+
+The goal is not to collect containers. It's to keep turning the lab into a more
+useful personal computing environment while learning from the systems problems
+that naturally come with it.
+
+## Documentation
+
+- [Hardware & roles](docs/hardware.md)
+- [Architecture](docs/architecture.md)
+- [Services](docs/services.md)
+- [Operations & reliability](docs/operations.md)
+- [Gaming infrastructure](docs/gaming.md)
+- [Selected changes & snapshots](docs/history/)
+
+This public repository intentionally leaves out credentials, private addresses,
+internal DNS names, exact management endpoints, and sensitive recovery detail.
+Architecture pages describe the design; dated snapshots preserve selected
+history. The live systems remain the source of truth for what is running now.

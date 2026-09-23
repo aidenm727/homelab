@@ -1,0 +1,18 @@
+date: 2026-06-23
+title: Add Proxmox workload storage while preserving archive data
+change_type: infrastructure
+status: verified
+
+intent:
+  - Expand local workload capacity on the virtualization host without risking existing archive data
+
+summary:
+  - Repurposed an NVMe device as a Proxmox-managed workload storage pool
+  - Kept the system disk, workload pool, and preservation media as distinct roles
+  - Verified an existing archive copy on separate media before changing storage ownership
+  - Omitted device identities, paths, and archive locations from the public record
+
+verification:
+  - Verified the workload pool was available to the hypervisor
+  - Verified the new physical and logical storage layers were present
+  - Verified the preservation copy was readable before repurposing the source device
