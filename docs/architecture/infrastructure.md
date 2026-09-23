@@ -1,130 +1,146 @@
 # Homelab Public Infrastructure Architecture
 
-**Provenance:** adapted from Sahale `docs/infrastructure.md` at `a252c116fc044eccaa4fd0bcc4ab029364d1329b`; source evidence dated 2026-06-23 to 2026-06-24.
+**Public scope:** durable architecture, trust boundaries, engineering patterns,
+and sanitized dated evidence.
 
-**Evidence window:** 2026-06-23 through 2026-06-24
-**Continuity claim:** None; current reality requires fresh authorized observation
+**Continuity claim:** none; current runtime state requires fresh authorized
+observation.
 
 ## Purpose
 
-This document owns public Homelab infrastructure roles, trust boundaries,
-operating patterns, and sanitized dated evidence. It deliberately
-does not contain addresses, real host or private DNS identities, exact inventory,
-endpoints, ports, container IDs, device or storage paths, management paths,
-backup destinations, credential references, or executable recovery steps.
+This document describes how the Homelab is structured without publishing the
+details required to reach, enumerate, or administer live systems.
 
-Exact non-secret desired state may require a separate restricted owner only
-when a real durable artifact justifies one. Secret values belong only in a
-secret manager or protected operational storage and never in Git.
+The public record may describe roles, capability classes, representative
+technology, failure boundaries, and dated verification outcomes. It deliberately
+omits private addressing, private DNS identities, current inventory, exact
+endpoints, ports, host or guest identifiers, storage paths, backup destinations,
+credential references, and executable recovery procedures.
 
-## Role Topology
+## Role topology
 
 ```text
 Owner devices
     │
-    ├── private access boundary
-    │
-    ▼
-Core-services environment
-    ├── network and name-resolution capabilities
-    ├── ingress and certificate boundary
-    ├── observability capabilities
-    ├── selected owner services
-    └── backup coordination
+    └── private access boundary
              │
-             ├── encrypted off-host/off-site protection pattern
+             ├── Core-services environment
+             │     ├── local network policy / name resolution
+             │     ├── internal HTTPS ingress
+             │     ├── availability / metrics / logs
+             │     ├── selected owner services
+             │     └── backup coordination
              │
-             └── bounded restore evidence
-
-Virtualization environment
-    ├── isolated VM/LXC workloads
-    ├── application experiments
-    └── migration and future compute capacity
+             └── Virtualization environment
+                   ├── isolated application workloads
+                   ├── gaming workload boundary
+                   └── disposable / experimental compute
 ```
 
-Role aliases describe architectural responsibility, not reachable systems.
+The core-services role favors continuity and lower change frequency. The
+virtualization role favors isolation, experimentation, and workloads that need a
+stronger resource boundary.
 
-## Capability Classes
+Role names are architectural aliases, not reachable system identities.
+
+## Capability classes
 
 | Class | Public pattern | Representative technology |
 | --- | --- | --- |
-| Private access | Administrative paths are restricted to owner-controlled private access | Tailscale-class overlay access |
-| Network services | Local name resolution and policy remain separate from public ingress | Pi-hole-class DNS filtering |
-| Ingress | One reverse-proxy boundary terminates internal HTTPS and routes approved services | Traefik-class reverse proxy |
-| Observability | Metrics, logs, health checks, dashboards, and alerts are separate capabilities | Prometheus/Grafana/Loki-class stack |
-| Owner services | Selected personal services run behind the same trust and evidence boundaries | Password-management and media-workflow classes |
-| Backup and recovery | Local snapshots, encrypted independent copies, verification, and bounded restore tests are distinct controls | Content-addressed backup tooling |
+| Private access | Administrative paths stay behind owner-controlled overlay access | Tailscale |
+| Network services | Local name resolution and filtering are separate from public Internet ingress | Pi-hole |
+| Internal ingress | A dedicated reverse proxy terminates private HTTPS and routes approved services | Traefik |
+| Availability | Simple service checks answer whether an expected surface is responding | Uptime Kuma |
+| Metrics | Host/service measurements are collected independently from presentation | Prometheus / node exporter |
+| Dashboards | Detailed operational visualization is separate from health truth | Grafana |
+| Logs | Centralized logs support diagnosis without becoming canonical state | Loki / Alloy |
+| Owner services | Selected private applications run behind the same network and evidence boundaries | Vaultwarden- and media-workflow classes |
+| Gaming | Game management and runtime workloads are isolated from core services and can remain on-demand | Crafty / Minecraft-class workloads |
+| Backup / recovery | Local versioning, independent encrypted copies, off-site protection, and restore proof are separate controls | Restic-class tooling |
 
-Representative technologies explain engineering choices; the table is not a
-complete live inventory or route list.
+Representative technology is included because the engineering choices are useful
+to understand. This table is not a current service inventory.
 
-## Trust Boundaries
+## Trust boundaries
 
-- The human owner remains the authority for goals, access, changes, acceptance,
-  and recovery decisions.
-- Public documentation cannot establish current reachability or health.
-- Private access reduces exposure but does not replace service authentication,
-  patching, least privilege, or backup.
-- Ingress, observability, application data, and backup each have distinct data
-  and failure boundaries.
-- Public documentation preserves sanitized roles and dated evidence.
+- The owner is the authority for access, changes, acceptance, and recovery
+  decisions.
+- Private overlay access reduces management exposure but does not replace
+  application authentication, patching, least privilege, or backup.
+- Internal ingress is a routing/certificate boundary, not a source of truth for
+  service health.
+- Dashboards and monitoring are observations, not authoritative system state.
+- Application data, logs, configuration, snapshots, and backup copies have
+  different retention and recovery concerns.
+- Public documentation does not grant operational authority and cannot prove
+  current reachability.
 
-## Dated Operational Evidence
+## Security and operational discipline
 
-The June 2026 Sahale source records documented the following bounded outcomes:
+The project favors explicit verification over configuration-by-assumption.
 
-- a resource-constrained core-services environment recovered its containerized
-  workloads after a planned restart and received explicit service checks;
-- local DNS, private access, internal HTTPS, metrics, logs, dashboards, health
-  checks, and alert delivery were individually verified;
-- backup snapshots could be listed, a bounded full restore was completed, and a
-  later encrypted off-site retrieval was verified;
-- a separate virtualization environment received local workload capacity,
-  private remote administration, node monitoring, and an initial application
-  workload.
+Public-safe dated records may preserve patterns such as:
 
-These are historical observations from 2026-06-23 and 2026-06-24. They do not
-prove that any system is currently online, reachable, protected, or restorable.
+- inspecting the effective daemon configuration rather than trusting a file
+  fragment;
+- validating syntax before reload/restart;
+- preserving an existing administrative session while changing remote-access
+  policy;
+- testing both an expected-success path and an expected-failure path;
+- checking Internet reachability from a genuinely external network before
+  describing a surface as non-public;
+- keeping unresolved facts, such as an untested address family, explicit rather
+  than normalizing them into a stronger claim.
 
-## Backup and Recovery Pattern
+Exact commands, addresses, firewall state, and current exposure results remain
+private/live unless a sanitized dated record is deliberately published.
+
+## Backup and recovery pattern
 
 ```text
 Application-owned data
     ├── portable export when supported
-    ├── local versioned snapshot
-    ├── encrypted off-host copy
+    ├── local versioned backup
+    ├── encrypted independent copy
     └── encrypted off-site copy
              │
-             └── dated integrity and restore evidence
+             └── dated integrity / restore verification
+
+Virtual machine state
+    └── scheduled hypervisor backup
+             └── explicitly documented failure domain
 ```
 
-Primary capacity, snapshots, independent backup, off-site protection, and
-restore proof are different controls. Public evidence may record objectives,
-method class, date, and redacted outcome. Provider identity, repository or
-bucket names, key and configuration locations, exact commands, and destinations
-remain private.
+Snapshots, local backup, independent backup, off-site protection, and restore
+proof are different controls. A successful backup job is not equivalent to a
+verified restore, and a hypervisor-local copy is not protection from complete
+host loss.
 
-## Operations and Change Discipline
+## Dated evidence
 
-Dated engineering evidence preserves what was attempted, why, the date, and a
-public-safe verification outcome. Live operations require separate authority
-and fresh evidence. A change should progress from experiment to supported
-capability only after its ownership, data boundary, observation, backup,
-rollback, and recovery expectations are understandable.
+Selected public-safe records include:
 
-## Known Limits
+- storage-pool creation with an explicit preservation boundary;
+- private overlay administration for the virtualization environment;
+- virtualization-host metrics integrated into the monitoring model;
+- an isolated application workload deployed on the virtualization environment;
+- a September 2026 operational baseline covering service reachability,
+  observability, SSH hardening, public-IPv4 exposure testing, backup continuity,
+  and on-demand gaming behavior.
 
-- The dated restore evidence is not a current recovery guarantee.
-- Exact live inventory is intentionally absent from this public repository.
-- The virtualization environment's primary storage is not an independent
-  failure domain.
-- Local-AI operation and a dedicated storage environment remain future work.
-- A restricted operational source remains conditional on a durable exact artifact.
+See [selected dated engineering evidence](../evidence/). Each record is bounded
+to its observation date.
 
-## Canonical Links
+## Known limits
 
-- [Virtualization record](infrastructure-virtualization.md)
-- [Service capability record](services.md)
-- [Sahale compute architecture](https://github.com/aidenm727/sahale/blob/main/docs/architecture/compute.md)
-- [Sahale repository ownership boundary](https://github.com/aidenm727/sahale/blob/main/docs/architecture/repository.md)
+- Public documentation is intentionally not a live inventory and does not
+  establish current health, exposure, or deployed optional capabilities.
+- Hypervisor-local VM backup remains in the virtualization host's failure domain.
+
+## Related records
+
+- [Virtualization and storage](infrastructure-virtualization.md)
+- [Service capability architecture](services.md)
 - [Selected dated engineering evidence](../evidence/)
+- [Sahale](https://github.com/aidenm727/sahale) — related peer project that may
+  use Homelab infrastructure where appropriate

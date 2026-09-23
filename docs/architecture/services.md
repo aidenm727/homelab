@@ -1,54 +1,85 @@
 # Homelab Service Architecture
 
-**Provenance:** adapted from Sahale `docs/services.md` at `a252c116fc044eccaa4fd0bcc4ab029364d1329b`; source evidence dated 2026-06-23 to 2026-06-24.
+**Public scope:** service capability classes, separation of responsibilities,
+representative technology, and sanitized dated verification.
 
-**Evidence window:** 2026-06-23 through 2026-06-24
-**Continuity claim:** None; this is not a live service catalog
+**Continuity claim:** none; this is not a live service catalog.
 
 ## Purpose
 
-This record describes service capability classes, trust boundaries,
-representative technologies, and dated verification without publishing a
-complete inventory, endpoint, route, port, container identity, data or config
-path, private DNS name, or management procedure.
+The Homelab uses small services with intentionally different responsibilities
+rather than one all-purpose control plane. This record explains those roles
+without publishing how to reach or administer live systems.
 
-## Capability Matrix
+## Capability matrix
 
-| Capability | Engineering role | Representative technology | Dated public evidence |
+| Capability | Engineering role | Representative technology | Evidence pattern |
 | --- | --- | --- | --- |
-| Owner start page and health view | Gives the owner a concise operational entry point without becoming the source of truth | Homepage- and Uptime-Kuma-class tools | Page rendering and health-check behavior were verified in the June 2026 record |
-| Metrics and dashboards | Separates measurement, storage, presentation, and alerting | Prometheus- and Grafana-class tools | Host and virtualization-node metrics plus dashboard queries were checked on 2026-06-24 |
-| Central logs | Supports bounded diagnosis without treating logs as canonical state | Loki- and Alloy-class tools | Log ingestion and query behavior were recorded as verified in June 2026 |
-| Local network policy | Provides owner-controlled name resolution and filtering | Pi-hole-class DNS tooling | Local resolution behavior was checked during the evidence window |
-| Private ingress | Routes explicitly approved internal services behind an HTTPS boundary | Traefik-class proxy and private overlay access | Private routing and certificate behavior were checked during the evidence window |
-| Owner data service | Demonstrates an isolated application workflow | Immich with Docker Compose | Initial component health and application response were checked on 2026-06-24 |
-| Encrypted backup | Separates backup creation, independent copies, verification, and restore | Content-addressed encrypted backup tooling | Snapshot listing, bounded restore, and later off-site retrieval were recorded as successful |
+| Owner entry / status | Gives the owner a concise front door without becoming the source of truth | Homepage-class start page | Rendering and service links checked in dated baselines |
+| Availability | Answers whether expected service surfaces are responding | Uptime Kuma | Monitor state checked independently from metrics |
+| Metrics | Collects host/service measurements | Prometheus / node exporter | Core and virtualization metrics verified |
+| Dashboards | Visualizes metrics and trends | Grafana | Metric queries checked in dated baselines |
+| Central logs | Supports diagnosis across services | Loki / Alloy | Log ingestion/query behavior verified in historical evidence |
+| Local network policy | Provides owner-controlled DNS filtering/name resolution | Pi-hole | Resolution and active query handling checked |
+| Private ingress | Routes approved internal services behind an HTTPS boundary | Traefik | Router/service health and certificate behavior checked |
+| Password management | Provides an owner data service behind the private access/ingress model | Vaultwarden | Application reachability and backup/restore evidence checked |
+| Gaming management | Separates game administration from game workload runtime | Crafty Controller | Management runtime and on-demand workload behavior checked |
+| Backup / recovery | Separates creation, retention, independent copies, and restore proof | Restic-class encrypted backup tooling | Dated job-success records plus bounded restore evidence |
 
-The technology names are representative examples from dated records. This
-matrix is intentionally not an exhaustive current inventory.
+The matrix is intentionally capability-oriented. It is not a promise that every
+named component is currently running, at a particular version, or reachable.
 
-## Service Boundaries
+## Observability separation
 
-- Public documentation describes why a capability exists and how trust is
-  separated; it does not describe how to reach or administer it.
-- Service authentication remains independent from private network access.
-- Dashboards and alerts are observations, not authoritative proof of state.
-- Application data, configuration, logs, and backup each have separate
-  retention and recovery concerns.
-- Secret values and credential references never belong in Git.
-- Current health, version, exposure, and inventory require fresh authorized
-  observation.
+The monitoring stack is intentionally layered:
 
-## Evidence Interpretation
+```text
+Availability checks  ──>  "is the expected surface responding?"
+Metrics collection   ──>  "what is the host/service measuring?"
+Dashboards           ──>  "how do those measurements look over time?"
+Central logs         ──>  "what happened around an event?"
+```
 
-The historical records show that the owner built and checked a small network,
-observability, ingress, application, and recovery stack under constrained
-hardware. They do not establish continuous availability, production scale,
-production-grade model serving, current patch level, or current recovery time.
+These signals complement each other. None of them alone establishes canonical
+system state, backup correctness, or recovery readiness.
 
-Executable runbooks, exact destinations, inventory, incident records, and
-private live evidence are candidates for a future private operations repository
-only when durable restricted version control becomes necessary.
+## Service boundaries
 
-See [the Homelab infrastructure owner](infrastructure.md) and [virtualization
-record](infrastructure-virtualization.md).
+- Private network access and application authentication are separate controls.
+- Reverse proxy reachability does not imply service correctness.
+- Monitoring data is observational and can itself be stale or incomplete.
+- Application data, configuration, logs, and backups have different retention
+  and recovery requirements.
+- Game-player ingress and administrative access are separate trust paths.
+- Critical services should not gain broad Docker/host authority merely for
+  dashboard convenience.
+- Secret values and credential references never belong in public Git.
+
+## Backup and owner-data boundary
+
+Password-management data is treated as a recovery-sensitive owner-data class.
+Historical and September 2026 evidence demonstrates that backup success is not
+accepted solely from a green monitor: local/off-site jobs, repository visibility,
+and bounded restore/integrity checks are separate observations.
+
+Other personal-data services remain experimental until their storage,
+independent backup, and restore requirements are clear.
+
+## Evidence interpretation
+
+The records demonstrate operation of a small but real network, observability,
+ingress, owner-service, recovery, and gaming stack on constrained hardware.
+
+They do not establish:
+
+- continuous availability;
+- production scale;
+- current patch level or versions;
+- complete inventory;
+- current public exposure;
+- a current recovery-time guarantee; or
+- readiness of future local-AI, media, or dedicated-storage systems.
+
+See [the infrastructure architecture](infrastructure.md),
+[virtualization architecture](infrastructure-virtualization.md), and
+[selected dated evidence](../evidence/).

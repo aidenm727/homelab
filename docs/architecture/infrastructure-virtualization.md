@@ -1,73 +1,103 @@
 # Homelab Virtualization Architecture
 
-**Provenance:** adapted from Sahale `docs/infrastructure-virtualization.md` at `a252c116fc044eccaa4fd0bcc4ab029364d1329b`; source evidence dated 2026-06-23 to 2026-06-24.
+**Public scope:** virtualization roles, storage/failure-domain reasoning, and
+sanitized dated evidence.
 
-**Evidence window:** 2026-06-23 through 2026-06-24
-**Continuity claim:** None; current reality requires fresh authorized observation
-
-## Purpose
-
-This document preserves the engineering value of Homelab virtualization
-history without publishing a real host identity, address, private DNS, exact
-hardware inventory, endpoint, port, guest ID, device or storage path, or
-management procedure.
+**Continuity claim:** none; current version, health, capacity, and guest state
+require fresh authorized observation.
 
 ## Role
 
 The virtualization environment is the flexible compute boundary for isolated
-VM and LXC workloads, application experiments, migration work, and potential
-future resource-intensive capability. It is distinct from the lower-change
+VM/LXC workloads, gaming infrastructure, application experiments, and future
+higher-resource work. It is intentionally distinct from the lower-change
 core-services environment.
 
-The documented implementation used Proxmox VE on repurposed workstation-class
-hardware. That technology choice is historical and representative; no current
-version, health, capacity, or availability is claimed.
+Dated records document Proxmox VE on repurposed
+workstation-class hardware. Public documentation keeps the technology and
+engineering reasoning while omitting real host identity, exact hardware
+inventory, management paths, private addresses, guest identifiers, and device or
+storage paths.
 
-## Storage and Failure Boundaries
+## Storage and failure boundaries
 
-The June 23 change record documents that existing local solid-state capacity
-was reassigned into a workload-oriented virtualization pool only after an
-existing archive copy was checked on separate media. The public record retains
-that preservation decision while omitting device, volume, pool, size, vendor,
-mount, and archive-location identities.
+The June 2026 storage record documents a deliberate transition of existing
+solid-state capacity into a workload-oriented virtualization pool only after an
+existing archive copy was verified on separate media.
 
-Local workload capacity improves placement and rollback options but remains in
-the virtualization host's failure domain. It is not an independent backup or a
-demonstrated migration target.
+The important engineering distinction is failure domain, not disk count:
 
-## Dated Workload Evidence
+- workload storage provides capacity and isolation for guests;
+- hypervisor-local snapshots/backups improve rollback and guest recovery;
+- a copy on the same physical host is not protection from complete host loss;
+- preservation data should be verified before storage ownership changes;
+- durable independent/off-site protection is a separate control.
 
-On 2026-06-24, the records documented:
+## Workload isolation
 
-- a Debian-class system container used as an isolated application boundary;
-- an Immich media-workflow stack deployed with Docker Compose as the first
-  application workload on the new pool;
-- application and component health checks returning expected results;
-- node metrics added to the existing observability model; and
-- private overlay administration verified without making management public.
+Virtualization is used to keep workloads with different change rates and failure
+profiles from becoming coupled to the core-services host.
 
-This is sanitized historical evidence. It is not a complete workload inventory,
-proof of present operation, proof of protected data, or proof of recoverability.
+Documented examples include:
 
-## Migration Reasoning
+- an isolated Debian-class LXC application boundary;
+- Docker Compose deployed inside a guest rather than directly on the hypervisor;
+- node-level metrics added to the existing monitoring model;
+- private overlay administration of the virtualization management surface; and
+- a dedicated gaming VM that separates game-server management/runtime work from
+  always-on network and owner services.
+
+The public record intentionally does not enumerate the current guest inventory.
+
+## Gaming workload pattern
+
+The gaming environment is treated as a distinct workload class rather than an
+extension of the core-services host.
+
+A September 2026 dated baseline documented:
+
+- an isolated VM hosting a Crafty-based game-server management runtime;
+- separation between private administration and explicit player ingress;
+- an on-demand modded Minecraft workload whose high memory use was traced to
+  the active Java server process rather than unexplained host pressure; and
+- successful return to low idle memory after the game workload was stopped.
+
+This supports a practical operating model: persistent management infrastructure
+can remain available while expensive game workloads run only when needed.
+
+## Backup pattern
+
+The virtualization environment has a scheduled compressed snapshot-style backup
+for the gaming VM. The September 2026 baseline verified that the job existed,
+was enabled, and had produced a scheduled archive.
+
+That is useful guest-level recovery evidence, but the copy remains local to the
+virtualization host. It therefore does not protect against complete host or
+local-backup-media loss.
+
+## Migration and experimentation principles
 
 - Keep application data ownership explicit and prefer portable exports.
 - Separate guest configuration, application state, attachments, and backup
   ownership.
-- Treat hypervisor-local snapshots as rollback, not independent protection.
-- Verify restore on a clean target before describing a workload as dependable.
-- Avoid making a service depend on the original host identity, storage device,
-  private route, or hypervisor-specific path.
-- Record exact deployment and recovery artifacts privately only when they need
-  durable version control.
+- Treat hypervisor-local snapshots as rollback/recovery tools, not independent
+  protection.
+- Verify restores before describing a workload as dependable.
+- Avoid unnecessary dependence on a specific host identity, private route,
+  device path, or hypervisor-local storage layout.
+- Keep experimental or learning environments disposable when possible.
+- Record exact restricted operational artifacts only when repeated use proves
+  they need durable private version control.
 
-## Public Boundary
+## Public boundary
 
-The public record owns role separation, representative technology, dated
-outcomes, storage/recovery reasoning, and migration principles. Exact inventory,
-addressing, private DNS, guests, configuration, backup destinations, recovery
-steps, incidents, and live evidence belong to future private operations
-ownership if and when such artifacts exist.
+The public record owns virtualization roles, representative technology,
+dated outcomes, failure-domain reasoning, and migration principles.
 
-See [the Homelab infrastructure record](infrastructure.md), [service
-capabilities](services.md), and [Sahale compute architecture](https://github.com/aidenm727/sahale/blob/main/docs/architecture/compute.md).
+Exact guest inventory, resource assignments, addressing, private DNS,
+management endpoints, device/storage paths, backup destinations, executable
+recovery steps, and current runtime state remain private/live.
+
+See [the infrastructure architecture](infrastructure.md),
+[service capability architecture](services.md), and
+[selected dated evidence](../evidence/).
