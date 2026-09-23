@@ -1,4 +1,4 @@
-# Aiden's Homelab
+# Homelab
 
 Personal homelab for self-hosting and systems work. I built most of it from
 repurposed hardware while studying computer science, and I use it for private
@@ -22,7 +22,7 @@ More detail: [hardware and roles](docs/hardware.md).
 ## Architecture
 
 ```text
-                         AIDEN'S HOMELAB
+                         HOMELAB
 
                     Tailscale private access
                              │

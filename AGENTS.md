@@ -1,6 +1,6 @@
 # Homelab Repository Instructions
 
-This repository documents Aiden's personal homelab for public technical use.
+This repository documents my personal homelab for public technical use.
 Keep the writing concrete, concise, and understandable to someone seeing the
 project for the first time.
 
