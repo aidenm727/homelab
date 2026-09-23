@@ -1,8 +1,9 @@
 # Homelab
 
-Public engineering record for the Homelab infrastructure domain. This local H1
-candidate has not been published. Sahale owns shared Platform architecture,
-capabilities, compute and execution policy, and cross-domain coordination;
+Public engineering record for the Homelab infrastructure domain. H1 extraction
+is published at https://github.com/aidenm727/homelab. Sahale owns shared
+Platform architecture, capabilities, compute and execution policy, and
+cross-domain coordination;
 running a Sahale capability here does not transfer its design ownership.
 
 ## Navigate
