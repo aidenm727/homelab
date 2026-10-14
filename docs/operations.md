@@ -3,6 +3,10 @@
 This page records the operating practices and troubleshooting examples that have
 become useful across the lab.
 
+Infrastructure evidence comes from the [September 23, 2026 baseline](history/2026-09-23-lab-baseline.yml).
+The [October 14 record](history/2026-10-14-sahale-observations.yml) adds Sahale
+runtime and backup-job observations.
+
 ## Operating approach
 
 - Check effective state after configuration changes.
@@ -56,14 +60,40 @@ through restore tests.
 
 The core-services host uses Restic with a local repository and an encrypted
 Backblaze B2 copy. Both paths have been used for Vaultwarden restore tests,
-followed by a SQLite integrity check.
+followed by a SQLite integrity check. These restore tests concern Vaultwarden;
+they do not demonstrate Sahale recovery.
 
 The Proxmox host also runs scheduled backups for the gaming VM. Those archives
-cover guest-level recovery and currently remain on the same physical host.
-Off-host VM protection is a future improvement.
+cover guest-level recovery and remained on the same physical host in the
+September baseline. Off-host VM protection is a future improvement.
 
 The Restic/B2 recovery material also needs an independent safe recovery path so
 it is available if the core-services machine is unavailable.
+
+### October 14 Sahale observations
+
+`sahale.service` was **active/running** on the T430. Sahale's public showcase
+describes a Node.js/SQLite application with a separate private Tailscale Serve
+access path. Live ingress configuration and the deployed application revision
+were not verified in these observations.
+
+The October 14 systemd observations explicitly used **EDT (UTC−04:00)**. The
+SQLite snapshot file timestamp carried **`-0400`**, consistent with that offset.
+
+| Job / systemd unit | Observed result | Completion time (EDT) |
+| --- | --- | --- |
+| SQLite snapshot / `sahale-snapshot.service` | Successful | 02:45:02 |
+| Local Restic / `homelab-restic-backup.service` | Successful | 03:00:10 |
+| Off-site Restic / `homelab-restic-backup-b2.service` | Successful | 04:00:29 |
+
+The SQLite snapshot file was modified at **02:45:02 EDT** and measured
+**274,432 bytes**.
+
+These are separate job results. They do not verify that either Restic repository
+included the Sahale SQLite snapshot, and no successful Sahale restore was
+demonstrated. Recovery verification still requires checking snapshot inclusion
+and restoring Sahale from the backup path. The earlier Vaultwarden restore
+tests remain separate evidence.
 
 ## Resource management
 
@@ -79,7 +109,3 @@ future concurrent workloads create sustained memory pressure.
 Security and package updates are handled during normal maintenance. Phased
 updates are allowed to follow their normal rollout, and firmware work is handled
 separately from routine package updates.
-
-Ansible is the next likely configuration-management step for repeated host
-policy such as SSH settings, packages, Docker prerequisites, monitoring agents,
-firewall rules, backup timers, and validation.

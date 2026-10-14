@@ -1,0 +1,40 @@
+date: 2026-10-14
+title: Sahale runtime and backup-job observations
+change_type: verification
+status: verified
+
+scope:
+  - Sahale workload on the ThinkPad T430
+  - SQLite snapshot and local/off-site Restic job results
+
+time_context:
+  systemd_observations: EDT (UTC-04:00)
+  snapshot_timestamp_offset: "-0400"
+
+snapshot_metadata:
+  modified_at: "2026-10-14 02:45:02 -0400"
+  size_bytes: 274432
+
+summary:
+  - Sahale's systemd service was active/running on the T430
+  - The public Sahale showcase describes Node.js/SQLite and a separate Tailscale Serve path
+  - The SQLite snapshot job completed successfully and a snapshot file was observed
+  - The local Restic backup job reported successful completion
+  - The off-site Restic backup job reported successful completion
+
+verification:
+  - sahale.service was active/running
+  - sahale-snapshot.service completed successfully at 02:45:02 EDT
+  - homelab-restic-backup.service completed successfully at 03:00:10 EDT
+  - homelab-restic-backup-b2.service completed successfully at 04:00:29 EDT
+  - The systemd observations explicitly used EDT
+  - The snapshot file timestamp carried the matching -0400 offset
+  - Successful SQLite snapshot and local/off-site Restic job results were observed
+
+known_limits:
+  - Job success does not establish that Restic included the Sahale SQLite snapshot
+  - A successful Sahale restore was not demonstrated
+  - Live ingress configuration and the deployed application revision were not verified
+  - Earlier Vaultwarden restore tests do not establish Sahale recovery
+  - The broader infrastructure inventory remains the September 23 baseline
+  - This record does not establish runtime state after October 14

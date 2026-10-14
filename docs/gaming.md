@@ -4,6 +4,9 @@ Gaming is a primary workload on the Proxmox host. Minecraft servers run inside a
 dedicated Debian VM so game-server changes and Java memory use stay isolated
 from core network and owner services.
 
+The workload details and measurements below reflect the
+[September 23, 2026 baseline](history/2026-09-23-lab-baseline.yml).
+
 ## Architecture
 
 ```text
@@ -31,10 +34,6 @@ needs to be reachable by players.
 Crafty handles Minecraft server creation, configuration, console access,
 start/stop/restart, files, versions, and server status.
 
-A future Gaming Hub could add a higher-level view of worlds, players, backup
-history, versions, and status while leaving server-management mechanics in
-Crafty.
-
 ## StoneBlock 4
 
 One documented workload is FTB StoneBlock 4:
@@ -49,29 +48,14 @@ week and the VM showed high memory use. Process-level inspection traced the
 usage to the Java server. VM memory returned to a low idle state after the server
 was stopped.
 
-Modded servers now run on demand. Crafty can remain available while the Java
-process stays off when nobody is playing.
+Modded servers were moved to on-demand operation. Crafty can remain available
+while the Java process stays off when nobody is playing.
 
 ## World data and backups
 
-The gaming VM has scheduled Proxmox backups. Longer term, world data should also
-have explicit world-level history and restore points independent of a specific
-VM installation.
+The September baseline verified scheduled Proxmox backups and a produced gaming
+VM archive. These backups remained on the virtualization host, so host loss
+remains a gap for that recovery path.
 
-Possible additions include:
-
-- world-level backup history;
-- restore points;
-- Minecraft and modpack version history;
-- long-lived personal worlds; and
-- a Game World Vault view for worlds, milestones, screenshots, and history.
-
-## Future work
-
-- durable Vanilla Forever world;
-- friends' SMP infrastructure;
-- better world/backup/history views;
-- simple server status and start/stop controls;
-- Sunshine/Moonlight support on a future gaming PC;
-- wake/sleep state in the Homelab Home; and
-- shared use of a future GPU node for gaming and local AI.
+World-level backup history and restore points independent of the VM are useful
+next steps, alongside an off-host copy of the VM archives.

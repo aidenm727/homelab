@@ -4,6 +4,11 @@ The Homelab has two main compute roles: a small always-on core-services machine
 and a Proxmox virtualization host. This keeps DNS, ingress, monitoring, password
 management, and backups independent from heavier VMs and game workloads.
 
+The infrastructure layout reflects the [September 23 baseline](history/2026-09-23-lab-baseline.yml),
+with Sahale added from the [October 14 observations](history/2026-10-14-sahale-observations.yml).
+The Sahale access path below reflects its public showcase design. Live ingress
+configuration and the deployed application revision were not verified.
+
 ## Topology
 
 ```text
@@ -11,27 +16,34 @@ Owner devices
     │
     │  Tailscale private administration
     ▼
-┌──────────────────────────┐        ┌──────────────────────────┐
-│ Core services            │        │ Virtualization           │
-│ ThinkPad T430 / Ubuntu   │        │ Proxmox / Ryzen host     │
-│                          │        │                          │
-│ Pi-hole                  │        │ VM / LXC workloads       │
-│ Traefik                  │        │   ├── gaming VM          │
-│ Vaultwarden              │        │   └── experiments        │
-│ Homepage                 │        │                          │
-│ Prometheus / Grafana     │◄───────┤ node metrics             │
-│ Loki / Alloy             │        │                          │
-│ Uptime Kuma              │        └──────────────────────────┘
-│ Restic                   │
-└────────────┬─────────────┘
-             │
-             ├── local versioned backup
-             └── encrypted Backblaze B2 copy
+ThinkPad T430 / Ubuntu Server
+    ├── Docker services
+    │     ├── Pi-hole: local DNS / filtering
+    │     ├── Traefik -> Vaultwarden / Homepage
+    │     ├── Prometheus -> Grafana
+    │     ├── Alloy -> Loki
+    │     └── Uptime Kuma: reachability
+    ├── systemd: Sahale (Node.js / SQLite)
+    │     └── scheduled SQLite snapshot job
+    └── Restic
+          ├── local versioned backup
+          └── encrypted Backblaze B2 copy
 
-Gaming VM
-    └── Crafty Controller
-            └── Minecraft workloads
-                    └── player ingress via Playit
+Proxmox / Ryzen host (also administered over Tailscale)
+    ├── node exporter -> T430 Prometheus
+    ├── VM / LXC workloads and experiments
+    └── Debian gaming VM
+          ├── Docker / Crafty Controller -> Minecraft
+          ├── Playit -> player-facing Minecraft ingress
+          └── scheduled Proxmox backup -> host-local archive
+```
+
+Private web access on the T430, including Sahale's documented Serve path:
+
+```text
+Owner devices over Tailscale
+    ├── Traefik -> private web services (Vaultwarden / Homepage)
+    └── Tailscale Serve -> Sahale's loopback Node.js listener
 ```
 
 Administration uses Tailscale. Player-facing game traffic uses a separate Playit
@@ -41,6 +53,9 @@ path.
 
 The T430 runs lower-resource services that benefit from staying available:
 DNS, ingress, monitoring, Vaultwarden, Homepage, and backup jobs.
+
+[Sahale](https://github.com/aidenm727/sahale) also runs on the T430 as a systemd
+workload using Node.js and SQLite. It has its own scheduled SQLite snapshot job.
 
 The Proxmox host runs VMs/LXCs, gaming infrastructure, and application
 experiments. Workloads can be rebuilt or resized there without tying those
@@ -54,6 +69,10 @@ dashboards, and other management surfaces remain off the public Internet.
 Pi-hole handles local DNS and filtering. Traefik routes private web services and
 terminates internal HTTPS. Applications keep their own authentication where
 required.
+
+Sahale's documented private HTTPS path uses Tailscale Serve, which forwards to
+its loopback listener. Its access controls are described in the
+[public application showcase](https://github.com/aidenm727/sahale).
 
 ## Virtualization and storage
 
@@ -86,11 +105,16 @@ checked through restore testing.
 ## Backup and recovery
 
 The core-services host uses Restic for versioned encrypted backups with local
-and Backblaze B2 copies. Restore tests have been performed against both paths.
+and Backblaze B2 copies. Vaultwarden restore tests have been performed against
+both paths, followed by SQLite integrity checks.
 
-The gaming VM also has scheduled Proxmox backups. Those archives currently stay
-on the virtualization host, so total host loss remains an uncovered failure
-case for that backup path.
+The September baseline also verified scheduled Proxmox backups for the gaming
+VM. Those archives stayed on the virtualization host, so total host loss remains
+an uncovered failure case for that backup path.
+
+October 14 observations confirmed successful Sahale SQLite snapshot, local
+Restic, and off-site Restic jobs. Snapshot inclusion in Restic and Sahale restore
+success remain unverified; see [operations](operations.md#october-14-sahale-observations).
 
 ## Public repository boundary
 

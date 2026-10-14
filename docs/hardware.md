@@ -1,7 +1,8 @@
 # Hardware & Roles
 
 Most of the lab uses repurposed consumer hardware. The specifications below are
-a September 2026 snapshot.
+a September 2026 snapshot. Sahale's T430 workload was verified separately on
+[October 14](history/2026-10-14-sahale-observations.yml).
 
 ## Core services: ThinkPad T430
 
@@ -12,8 +13,11 @@ a September 2026 snapshot.
 - **Role:** always-on core-services machine
 
 The T430 runs local DNS, private ingress, monitoring, Vaultwarden, Homepage, and
-backup jobs. Its current Docker stack fits comfortably within the available CPU,
-memory, and storage.
+backup jobs. The September Docker stack had headroom in CPU, memory, and
+storage. The October observations add [Sahale](https://github.com/aidenm727/sahale),
+a Node.js/SQLite workload managed by systemd. Its public showcase documents
+private access through Tailscale Serve; live ingress configuration was not
+verified in the October checks.
 
 ## Virtualization host
 
@@ -24,10 +28,11 @@ memory, and storage.
 - **System storage:** 500 GB SATA SSD
 - **VM/LXC storage:** 1 TB NVMe SSD
 - **Additional storage:** 2 TB SATA SSD used for archive/preservation data
-- **Role:** VMs/LXCs, gaming, application experiments, future lab VMs
+- **Role:** VMs/LXCs, gaming, application experiments
 
-Memory is the current limiting resource for additional concurrent workloads. A
-32 GiB upgrade is a reasonable future option if those workloads appear.
+Memory was the limiting resource for additional concurrent workloads in the
+September baseline. A RAM upgrade can be sized when measured workload demand
+requires it.
 
 ## Gaming VM
 
@@ -49,14 +54,4 @@ ingress isolated from the T430 services.
 - **Role:** development, SSH administration, maintenance, testing, local
   experiments
 
-The G14 is the main operator/development machine. It is also the first candidate
-for local model-serving experiments before adding dedicated AI hardware.
-
-## Possible hardware additions
-
-- **More Proxmox memory** for additional concurrent VMs and lab workloads.
-- **Gaming/GPU desktop** for normal desktop use, Sunshine streaming, local model
-  serving, and occasional GPU/transcoding work.
-
-A dedicated NAS remains optional. Storage hardware can be sized once photo,
-media, preservation, game-world, or backup growth creates a clear requirement.
+The G14 serves as the operator/development machine in the September snapshot.
