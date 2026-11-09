@@ -12,11 +12,12 @@ specific date.
 - [2026-06-24: Immich virtualization experiment](2026-06-24-immich-experiment.yml)
 - [2026-09-23: Lab baseline](2026-09-23-lab-baseline.yml)
 - [2026-10-14: Sahale runtime and backup-job observations](2026-10-14-sahale-observations.yml)
+- [2026-10-30: Off-site restore test and backup alerting](2026-10-30-restore-test.yml)
 
 The September baseline covers the wider infrastructure. The October record
 adds Sahale observations, with systemd times in EDT and a snapshot timestamp
-offset of `-0400`; it does not refresh the full lab inventory or establish Sahale
-restore success.
+offset of `-0400`. The October 30 record adds the restore test from the off-site
+copy. Neither refreshes the full lab inventory.
 
 Private addresses, internal DNS, credentials, secret locations, and executable
 management/recovery details are omitted from these records.

@@ -14,10 +14,10 @@ a September 2026 snapshot. Sahale's T430 workload was verified separately on
 
 The T430 runs local DNS, private ingress, monitoring, Vaultwarden, Homepage, and
 backup jobs. The September Docker stack had headroom in CPU, memory, and
-storage. The October observations add [Sahale](https://github.com/aidenm727/sahale),
-a Node.js/SQLite workload managed by systemd. Its public showcase documents
-private access through Tailscale Serve; live ingress configuration was not
-verified in the October checks.
+storage. The October observations add [Sahale Fitness](https://github.com/aidenm727/sahale-fitness),
+a Node.js/SQLite workload managed by systemd. Its repository documents private
+access through Tailscale Serve, and the live configuration was recorded on
+October 30.
 
 ## Virtualization host
 

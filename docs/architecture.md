@@ -6,8 +6,8 @@ management, and backups independent from heavier VMs and game workloads.
 
 The infrastructure layout reflects the [September 23 baseline](history/2026-09-23-lab-baseline.yml),
 with Sahale added from the [October 14 observations](history/2026-10-14-sahale-observations.yml).
-The Sahale access path below reflects its public showcase design. Live ingress
-configuration and the deployed application revision were not verified.
+The Sahale access path below was recorded from the live host on
+[October 30](history/2026-10-30-restore-test.yml).
 
 ## Topology
 
@@ -54,7 +54,7 @@ path.
 The T430 runs lower-resource services that benefit from staying available:
 DNS, ingress, monitoring, Vaultwarden, Homepage, and backup jobs.
 
-[Sahale](https://github.com/aidenm727/sahale) also runs on the T430 as a systemd
+[Sahale Fitness](https://github.com/aidenm727/sahale-fitness) also runs on the T430 as a systemd
 workload using Node.js and SQLite. It has its own scheduled SQLite snapshot job.
 
 The Proxmox host runs VMs/LXCs, gaming infrastructure, and application
@@ -70,9 +70,9 @@ Pi-hole handles local DNS and filtering. Traefik routes private web services and
 terminates internal HTTPS. Applications keep their own authentication where
 required.
 
-Sahale's documented private HTTPS path uses Tailscale Serve, which forwards to
-its loopback listener. Its access controls are described in the
-[public application showcase](https://github.com/aidenm727/sahale).
+Sahale's private HTTPS path uses Tailscale Serve, which forwards to its
+loopback listener. Its access controls are described in the
+[application repository](https://github.com/aidenm727/sahale-fitness#phone-access).
 
 ## Virtualization and storage
 
@@ -113,8 +113,9 @@ VM. Those archives stayed on the virtualization host, so total host loss remains
 an uncovered failure case for that backup path.
 
 October 14 observations confirmed successful Sahale SQLite snapshot, local
-Restic, and off-site Restic jobs. Snapshot inclusion in Restic and Sahale restore
-success remain unverified; see [operations](operations.md#october-14-sahale-observations).
+Restic, and off-site Restic jobs. An October 30 restore test then recovered the
+Sahale database and the T430's configuration from the off-site copy; see
+[operations](operations.md#october-30-restore-test).
 
 ## Public repository boundary
 

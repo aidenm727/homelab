@@ -5,7 +5,8 @@ become useful across the lab.
 
 Infrastructure evidence comes from the [September 23, 2026 baseline](history/2026-09-23-lab-baseline.yml).
 The [October 14 record](history/2026-10-14-sahale-observations.yml) adds Sahale
-runtime and backup-job observations.
+runtime and backup-job observations, and the [October 30 record](history/2026-10-30-restore-test.yml)
+adds a restore test from the off-site copy.
 
 ## Operating approach
 
@@ -60,15 +61,16 @@ through restore tests.
 
 The core-services host uses Restic with a local repository and an encrypted
 Backblaze B2 copy. Both paths have been used for Vaultwarden restore tests,
-followed by a SQLite integrity check. These restore tests concern Vaultwarden;
-they do not demonstrate Sahale recovery.
+followed by a SQLite integrity check. Sahale recovery was tested separately on
+[October 30](#october-30-restore-test).
 
 The Proxmox host also runs scheduled backups for the gaming VM. Those archives
 cover guest-level recovery and remained on the same physical host in the
 September baseline. Off-host VM protection is a future improvement.
 
-The Restic/B2 recovery material also needs an independent safe recovery path so
-it is available if the core-services machine is unavailable.
+The Restic/B2 recovery material is kept in an encrypted offline recovery kit
+with copies in three places, so it is available if the core-services machine is
+not.
 
 ### October 14 Sahale observations
 
@@ -91,9 +93,23 @@ The SQLite snapshot file was modified at **02:45:02 EDT** and measured
 
 These are separate job results. They do not verify that either Restic repository
 included the Sahale SQLite snapshot, and no successful Sahale restore was
-demonstrated. Recovery verification still requires checking snapshot inclusion
-and restoring Sahale from the backup path. The earlier Vaultwarden restore
-tests remain separate evidence.
+demonstrated on that date. Both were established on October 30, below.
+
+### October 30 restore test
+
+Both off-site snapshot groups were restored onto a machine other than the T430,
+using only the offline recovery kit. The restored Sahale Fitness database passed
+a SQLite integrity check, and restored reverse-proxy and dashboard configuration
+files were identical to the recorded copies.
+
+The same day, both backup jobs were connected to an outside dead-man's-switch
+check. A deliberate failure report produced an alert email within a minute. The
+T430 was also changed so that it no longer depends on its own DNS filter for
+name resolution, which was tested by stopping the filter.
+
+Limits: the local repository was not restored in this run, the case where no
+report arrives at all was not exercised, and rebuilding a service from the
+restored files was not rehearsed. See the [dated record](history/2026-10-30-restore-test.yml).
 
 ## Resource management
 

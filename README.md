@@ -5,9 +5,10 @@ repurposed hardware while studying computer science, and I use it for private
 services, monitoring, backups, Minecraft servers, and infrastructure
 experiments.
 
-> **Infrastructure baseline: September 23, 2026.** Sahale runtime and backup-job
-> observations were verified separately on [October 14, 2026](docs/history/2026-10-14-sahale-observations.yml).
-> The October observations do not refresh the full infrastructure inventory.
+> **Infrastructure baseline: September 23, 2026.** Two later records add to it:
+> Sahale runtime and backup-job observations on [October 14](docs/history/2026-10-14-sahale-observations.yml),
+> and a restore test from the off-site backup on [October 30](docs/history/2026-10-30-restore-test.yml).
+> Neither refreshes the full infrastructure inventory.
 
 ## Lab at a glance
 
@@ -46,9 +47,8 @@ The T430 carries the lightweight services I want available most of the time.
 The Proxmox host carries VMs, game servers, and experiments that need more
 resources or stronger isolation.
 
-Sahale's documented access design uses Tailscale Serve separately from Traefik.
-The October checks did not verify live ingress configuration or the deployed
-application revision.
+Sahale Fitness is published through Tailscale Serve, separately from Traefik.
+That configuration was recorded from the live host on October 30.
 
 [Architecture details](docs/architecture.md)
 
@@ -57,9 +57,8 @@ application revision.
 - **Networking and access:** Tailscale, Pi-hole, Traefik
 - **Observability:** Prometheus, node exporter, Grafana, Loki, Alloy, Uptime Kuma
 - **Core services:** Vaultwarden, Homepage, supporting Docker services
-- **Personal application:** [Sahale](https://github.com/aidenm727/sahale), a
-  systemd-managed Node.js/SQLite application for fitness, career tracking, and
-  AI-assisted workflows on the T430
+- **Personal application:** [Sahale Fitness](https://github.com/aidenm727/sahale-fitness), a systemd-managed
+  Node.js/SQLite workout logger on the T430
 - **Backup:** Restic with local and encrypted Backblaze B2 copies, plus scheduled
   Proxmox VM backups
 - **Gaming:** Crafty Controller, Minecraft, Playit
@@ -109,10 +108,12 @@ restored the Vaultwarden database from both paths and checked SQLite integrity o
 the restored copy. The Proxmox host also keeps scheduled VM backups for the
 gaming VM.
 
-On October 14, Sahale's SQLite snapshot job and the local and off-site Restic
-jobs reported successful completion. Those results do not establish that Restic
-included the Sahale snapshot or that Sahale can be restored. See the
-[dated observations and limits](docs/operations.md#october-14-sahale-observations).
+On October 30 I restored the T430's configuration and the Sahale Fitness
+database from the encrypted off-site copy onto a different machine, using only
+an offline recovery kit. The restored database passed a SQLite integrity check
+and the restored configuration files matched the recorded ones. Both backup
+jobs now report to an outside dead-man's-switch check, so a failed run sends an
+alert. See the [dated record and its limits](docs/history/2026-10-30-restore-test.yml).
 
 ### External exposure testing
 
@@ -139,8 +140,9 @@ and Playit handles player-facing game traffic.
 
 ## Remaining reliability work
 
-Verify Sahale snapshot inclusion in Restic and test a Sahale restore. The gaming
-VM's Proxmox archives also need an off-host recovery copy to cover host loss.
+The gaming VM's Proxmox archives need an off-host recovery copy to cover host
+loss. The October 30 restore test used the off-site copy; the local repository
+and a full service rebuild from restored files have not been rehearsed.
 
 ## Documentation
 

@@ -11,10 +11,10 @@ The later observations do not establish current state for the full inventory.
 | Private access | **Tailscale** | Remote administration of private management surfaces |
 | DNS / filtering | **Pi-hole** | Local name resolution and DNS filtering |
 | Ingress | **Traefik** | Private HTTPS routing for web services |
-| Application access | **Tailscale Serve** | Documented separate private HTTPS path to Sahale's loopback listener; live configuration unverified |
+| Application access | **Tailscale Serve** | Separate private HTTPS path to Sahale's loopback listener; configuration recorded October 30 |
 | Passwords | **Vaultwarden** | Self-hosted password management |
 | Start page | **Homepage** | Owner-facing entry point into the lab |
-| Personal application | **[Sahale](https://github.com/aidenm727/sahale)** | Fitness, career tracking, and AI-assisted workflows; Node.js/SQLite under systemd on the T430 |
+| Personal application | **[Sahale Fitness](https://github.com/aidenm727/sahale-fitness)** | Set-by-set workout logger; Node.js/SQLite under systemd on the T430 |
 | Metrics | **Prometheus + node exporter** | Host/service metrics collection |
 | Dashboards | **Grafana** | Metrics visualization and trends |
 | Logs | **Loki + Alloy** | Centralized log collection/querying |
@@ -64,13 +64,13 @@ history. Restore testing is the recovery check.
 The September 2026 T430 snapshot included the Docker infrastructure services
 and supporting health and monitoring containers. CPU, memory, and storage had
 headroom for that stack at the time of the baseline. Sahale's runtime comes from
-the October observations; the Tailscale Serve path follows its public showcase
-design, with live ingress configuration and deployed revision unverified.
+the October observations, and its Tailscale Serve path was recorded from the
+live host on October 30.
 
 The October observations verified Sahale's systemd runtime and successful
-SQLite snapshot, local Restic, and off-site Restic jobs. They did not verify that
-the Sahale snapshot was included in Restic or that Sahale had been restored.
-See [operations](operations.md#october-14-sahale-observations) for those limits.
+SQLite snapshot, local Restic, and off-site Restic jobs. The October 30 restore
+test then recovered the Sahale database from the off-site copy. See
+[operations](operations.md#october-30-restore-test).
 
 ## Experiments
 
