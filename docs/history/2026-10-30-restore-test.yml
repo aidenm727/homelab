@@ -1,0 +1,40 @@
+date: 2026-10-30
+title: Off-site restore test and backup alerting
+change_type: verification
+status: verified
+
+intent:
+  - Prove that the core-services host can be recovered from the off-site backup without the host itself
+  - Make a failed or missing backup run visible
+
+scope:
+  - Restic off-site copy of the ThinkPad T430's configuration and the Sahale Fitness database
+  - Offline recovery kit
+  - Backup job alerting
+  - DNS dependency of the core-services host
+  - Sahale Fitness private access path
+
+summary:
+  - Restored both off-site snapshot groups onto a different machine using only the offline recovery kit
+  - The restored Sahale Fitness SQLite database passed an integrity check
+  - Restored reverse-proxy and dashboard configuration files were identical to the recorded copies
+  - The recovery kit's key decrypted an encrypted configuration file
+  - Added an outside dead-man's-switch check for the local and off-site backup jobs
+  - Removed the core-services host's dependency on its own DNS filter for name resolution
+  - Recorded the live Tailscale Serve configuration that publishes Sahale Fitness
+
+verification:
+  - The restore ran on a machine other than the T430 and used only the offline recovery kit
+  - SQLite integrity_check returned ok on the restored database
+  - Both backup jobs, run by hand, reported to their checks
+  - A deliberate failure report produced an alert email within a minute
+  - With the DNS filter stopped, the host still resolved Internet names, and the filter restarted cleanly
+  - Re-applying the recorded Serve configuration left the live configuration unchanged
+
+known_limits:
+  - The test restored from the off-site copy; the local repository was not restored in this run
+  - The silent path of the dead-man's switch, where no report arrives at all, was not exercised
+  - Loading the restored TLS certificate into a fresh reverse proxy was not rehearsed
+  - Restoring the DNS filter's own settings was not rehearsed
+  - Proxmox VM archives still have no off-host copy
+  - The broader infrastructure inventory remains the September 23 baseline
